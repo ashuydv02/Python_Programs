@@ -31,3 +31,13 @@ if number >= 0:
         print('Number is positive')
 else:
     print('Number is negative')
+
+# If else with logical operators :-
+    
+age = 35
+salary = 6000
+
+if age >= 30 and salary >= 5000:
+    print('Eligible for the premium membership.')
+else:
+    print('Not eligible for the premium membership')
