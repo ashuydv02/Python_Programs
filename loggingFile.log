@@ -1,0 +1,11 @@
+2024-06-12 18:29:44 - root - ERROR - Ashish raised an error
+2024-06-12 18:29:44 - root - DEBUG - Harmless debug Message
+2024-06-12 18:29:44 - root - INFO - Just an information
+2024-06-12 18:29:44 - root - WARNING - Its a Warning
+2024-06-12 18:29:44 - root - ERROR - Did you try to divide by zero
+2024-06-12 18:29:44 - root - CRITICAL - Internet is down
+2024-06-12 18:46:14,149 - root - DEBUG - Harmless debug Message
+2024-06-12 18:46:14,149 - root - INFO - Just an information
+2024-06-12 18:46:14,150 - root - WARNING - Its a Warning
+2024-06-12 18:46:14,150 - root - ERROR - Did you try to divide by zero
+2024-06-12 18:46:14,150 - root - CRITICAL - Internet is down
