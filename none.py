@@ -13,4 +13,4 @@ variable = None
 if variable is None:
     print("Variable is None")
 
-
+print(type(None))
