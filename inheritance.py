@@ -3,15 +3,17 @@ class vehicle:
     type = ""
 
     def display_model(self):
-        print(self.model)
+        print(vehicle.model)
+
 
 class car(vehicle):
     def __init__(self, name):
-        self.model = name
-        self.type = "Car"
-    
+        vehicle.model = name
+        vehicle.type = "Car"
+
     def speed(self, topspeed):
         print(f"Top Speed of {self.model} is {topspeed}")
+
 
 swift = car("swift")
 print(swift.type)
