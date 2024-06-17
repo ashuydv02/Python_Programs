@@ -2,7 +2,7 @@
 def flattening(var):
     flatten_dictionary = {}
     for item in var:
-        if type(var[item]) is dict:
+        if isinstance(var[item],dict):
             for key, value in flattening(var[item]).items():
                 flatten_dictionary[str(item) + "." + str(key)] = value
         else:
