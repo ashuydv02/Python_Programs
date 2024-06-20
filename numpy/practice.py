@@ -45,5 +45,17 @@ arr_3d = np.arange(12).reshape(3,2,2)
 print(arr_3d.ndim)
 print(arr_3d.base)  # Reshape gives view of original array
 
-print(arr_3d.reshape(-1)) # Converting multidimesional array to one D array.
+# print(arr_3d.reshape(-1)) # Converting multidimesional array to one D array.
 
+# Iterating arrays by nd,iter() with the help of basic for loop
+# for num in np.nditer(arr_3d, flags=['buffered'], op_dtypes='S'):
+#     print(num)
+
+# for index, num in np.ndenumerate(arr_3d):
+#     print(index, num)
+
+demo_arr = np.array([9, 8, 7, 6, 5])
+# joined_arr = np.concatenate((arr1, demo_arr))
+joined_arr = np.stack((arr1, demo_arr), axis=1)
+
+# print(joined_arr)
