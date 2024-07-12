@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="card">
+        <div class="card-body">
+            <h3 class="card-title text-center">User Registration Form</h3>
+            <form method="post">
+                {% csrf_token %}
+                
+                {% if form %}
+                    {% for field in form %}
+                        {% if field.errors %}
+                            {% for error in field.errors %}
+                                <div class="alert alert-danger" role="alert">
+                                    {{ field.label }}: {{ error }}
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+                
+                <div class="form-group">
+                    <label for="exampleInputUsername"><i class="fas fa-user"></i> User Name</label>
+                    <input type="text" class="form-control" name="username" id="exampleInputUsername" placeholder="Username" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="exampleInputfname"><i class="fas fa-user"></i> First Name</label>
+                    <input type="text" class="form-control" name="first_name" id="exampleInputfname" placeholder="First name" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="exampleInputlname"><i class="fas fa-user"></i> Last Name</label>
+                    <input type="text" class="form-control" name="last_name" id="exampleInputlname" placeholder="Last name" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="exampleInputnumber"><i class="fas fa-phone"></i> Phone Number</label>
+                    <input type="text" class="form-control" name="phone_number" id="exampleInputnumber" placeholder="9876543210" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="exampleInputemail1"><i class="fas fa-envelope"></i> Email</label>
+                    <input type="email" name="email" class="form-control" id="exampleInputEmail1" placeholder="E-mail" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="exampleInputPassword1"><i class="fas fa-lock"></i> Password</label>
+                    <input type="password" name="password1" class="form-control" id="exampleInputPassword1" placeholder="Password" required>
+                    <small id="passhelp" class="form-text text-muted">
+                        <b>*</b> Password must be more than 8 characters<br>
+                        <b>*</b> Password must be different from Username<br>
+                        <b>*</b> Password must be strong and unique<br>
+                        <b>*</b> Password must contain A-Z, a-z, 1-9, @, #, $, &, *, ...
+                    </small>
+                </div>
+
+                <div class="form-group">
+                    <label for="exampleInputPassword2"><i class="fas fa-lock"></i> Confirm Password</label>
+                    <input type="password" name="password2" class="form-control" id="exampleInputPassword2" placeholder="Confirm Password" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="exampleInputaddress"><i class="fas fa-home"></i> Address</label>
+                    <input type="text" class="form-control" name="address" id="exampleInputaddress" placeholder="Street No.1, House No.1, Indore, Pincode=452040" required>
+                </div>
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                    <a href="{% url 'login' %}" class="btn btn-success">Already Registered? Login Here</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Add this in your <head> section or at the end of your body -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+{% endblock %}
