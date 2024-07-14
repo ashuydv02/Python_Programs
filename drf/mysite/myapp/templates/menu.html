@@ -4,145 +4,25 @@
 
 <div class="container my-5">
     <h2 class="text-center mb-4">Our Menu</h2>
-    <div class="row">
-        <div class="col-md-4">
-            <div class="card mb-4">
-                <img src="https://media.istockphoto.com/id/1413557034/photo/indian-mumbai-street-style-pav-bhaji-garnished-with-peas-raw-onions-coriander-and-butter.webp?b=1&s=170667a&w=0&k=20&c=vKmvR_o9UraTsGpz33WLjjyVLiI_AWPlvjfXaws_yMo=" class="card-img-top fixed-size-img" alt="Item 1">
-                <div class="card-body">
-                    <h5 class="card-title">Item 1</h5>
-                    <p class="card-text">Description of the menu item.</p>
-                    <p class="card-text"><strong>$10.99</strong></p>
-                    <a href="#" class="btn btn-primary">Order Now</a>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card mb-4">
-                <img src="https://media.istockphoto.com/id/1303091718/photo/kerala-vegetarian-foods-dosa-with-curries.webp?b=1&s=170667a&w=0&k=20&c=V2Td7iWPMFyfpiAa_pmnEPAgPWSaZY8c2QM_1ksjdP0=" class="card-img-top fixed-size-img" alt="Item 2">
-                <div class="card-body">
-                    <h5 class="card-title">Item 2</h5>
-                    <p class="card-text">Description of the menu item.</p>
-                    <p class="card-text"><strong>$12.99</strong></p>
-                    <a href="#" class="btn btn-primary">Order Now</a>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card mb-4">
-                <img src="https://media.istockphoto.com/id/1156129917/photo/group-of-gujarati-snacks-like-jalebi-fafda-thepla-khaman-dhokla-aloo-bhujiya-khandvi-khakra.webp?b=1&s=170667a&w=0&k=20&c=I46_FloTQcwCce4UqXESG2tpQ_7MOA-qFgw0CSTICOg=" class="card-img-top fixed-size-img" alt="Item 3">
-                <div class="card-body">
-                    <h5 class="card-title">Item 3</h5>
-                    <p class="card-text">Description of the menu item.</p>
-                    <p class="card-text"><strong>$8.99</strong></p>
-                    <a href="#" class="btn btn-primary">Order Now</a>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-md-4">
+    <div class='row'>
+    {% for product in products %}
+        <div class="col-md-3 mb-3">
             <div class="card">
-                <img class="img-thumbnail fixed-size-img" src="https://media.istockphoto.com/id/1424509973/photo/gulab-jamun-an-indian-dessert.webp?b=1&s=170667a&w=0&k=20&c=dTg1FLEAiSVvtg_3HLYF38_pW8Iec1i9yMaLVxMtsXM=" class="card-img-top" alt="...">
+                <img class="img-thumbnail fixed-size-img" src="{{product.image.url}}" class="card-img-top" alt="...">
                 <div class="card-body">
-                    <h4 class="card-title">Gulab Jamun</h4>
-                    <p class="card-text">A Delicious Dessert Waiting for you...</p>
-                    <p class="card-text"><strong>$10.99</strong></p>
-                    <a href="#" class="btn btn-primary">Order Now</a>
+                    <h4 class="card-title">{{product.name}}</h4>
+                    <p class="card-text">{{product.description}}</p>
+                    <p class="card-text"><strong>{{product.price}}</strong></p>
+                    <form method='post'>
+                        {% csrf_token %}
+                        <input type='hidden' name='product_id' value='{{product.id}}'>
+                        <input type='hidden' name='product_price' value='{{product.price}}'>
+                        <button type='submit' class="btn btn-primary">Add TO Cart</button>
+                    </form>
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
-            <div class="card">
-                <img class="img-thumbnail fixed-size-img" src="https://media.istockphoto.com/id/1085155140/photo/malai-or-achari-paneer-in-a-gravy-made-using-red-gravy-and-green-capsicum-served-in-a-bowl.webp?b=1&s=170667a&w=0&k=20&c=6f2_VPRj2KUSYI35Q5i6w5llzoHzuZCe-HTljbL1Vrg=" class="card-img-top" alt="...">
-                <div class="card-body">
-                    <h4 class="card-title">Chilli Paneer</h4>
-                    <p class="card-text">The Delicious Mix of Panner with veggies...</p>
-                    <p class="card-text"><strong>$10.99</strong></p>
-                    <a href="#" class="btn btn-primary">Order Now</a>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card">
-                <img class="img-thumbnail fixed-size-img"   src="https://t4.ftcdn.net/jpg/03/97/98/73/360_F_397987329_4M4rOKawfjdwC6Gkf6o41i4wXAOwmRCh.jpg" class="card-img-top" alt="...">
-                <div class="card-body">
-                    <h4 class="card-title">Chole Bhature</h4>
-                    <p class="card-text">Famous Panjabi style Chole Bhature...</p>
-                    <p class="card-text"><strong>$10.99</strong></p>
-                    <a href="#" class="btn btn-primary">Order Now</a>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="row mt-4">
-        <div class="col-md-4">
-            <div class="card">
-                <img class="img-thumbnail fixed-size-img" src="https://media.istockphoto.com/id/1397648059/photo/malai-kofta-curry.webp?b=1&s=170667a&w=0&k=20&c=Z8B84I7Z6Ct6DWdn-UOnjkspGBAFKE1Yym5D3ZBCd70=" class="card-img-top" alt="...">
-                <div class="card-body">
-                    <h4 class="card-title">Malai Paneer</h4>
-                    <p class="card-text">A Kaju With special malai Tadka...</p>
-                    <p class="card-text"><strong>$10.99</strong></p>
-                    <a href="#" class="btn btn-primary">Order Now</a>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card">
-                <img class="img-thumbnail fixed-size-img" src="https://media.istockphoto.com/id/1156631698/photo/rasgulla-sweet-food.webp?b=1&s=170667a&w=0&k=20&c=kL1Q5EG0ZtF446Hv17j1bKOZf7twEZO8DXTcpk9fb-s=" class="card-img-top" alt="...">
-                <div class="card-body">
-                    <h4 class="card-title">Ras-Gulla</h4>
-                    <p class="card-text">A Delicious Dessert Waiting for you...</p>
-                    <p class="card-text"><strong>$10.99</strong></p>
-                    <a href="#" class="btn btn-primary">Order Now</a>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card">
-                <img class="img-thumbnail fixed-size-img" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ-60L-lYk4s_IHm3yu839iHJa1MGpzW1sPVA&s" class="card-img-top" alt="...">
-                <div class="card-body">
-                    <h4 class="card-title">Butter Naan</h4>
-                    <p class="card-text">Famous Panjabi style Naan With floated butter...</p>
-                    <p class="card-text"><strong>$10.99</strong></p>
-                    <a href="#" class="btn btn-primary">Order Now</a>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="row mt-4">
-        <div class="col-md-4">
-            <div class="card">
-                <img class="img-thumbnail fixed-size-img" src="https://media.istockphoto.com/id/905487810/photo/veg-biryani-or-veg-pulav-or-steamed-rice.webp?b=1&s=170667a&w=0&k=20&c=lUxwO0gDy0dRHxIhNQ73HhABMs-Cz6OPhY__b7h2sAc=" class="card-img-top" alt="...">
-                <div class="card-body">
-                    <h4 class="card-title">Palav</h4>
-                    <p class="card-text">Mix of rice with veggies to give a delicious taste...</p>
-                    <p class="card-text"><strong>$10.99</strong></p>
-                    <a href="#" class="btn btn-primary">Order Now</a>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card">
-                <img class="img-thumbnail fixed-size-img" src="https://media.istockphoto.com/id/2148412141/photo/paneer-lababdar.webp?b=1&s=170667a&w=0&k=20&c=7naV_hgjp5Pp6BEVYxN-HtxTgNMuaH9ItDTrA9HsFbs=" class="card-img-top" alt="...">
-                <div class="card-body">
-                    <h4 class="card-title">Butter Naan with paneer-lababdar</h4>
-                    <p class="card-text">Delicious Meal to your doorstep...</p>
-                    <p class="card-text"><strong>$10.99</strong></p>
-                    <a href="#" class="btn btn-primary">Order Now</a>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card">
-                <img class="img-thumbnail fixed-size-img" src="https://media.istockphoto.com/id/852173226/photo/indian-cuisine-dal-baati.webp?b=1&s=170667a&w=0&k=20&c=a0ECwh9AaIsBobNDepxB_4mYaISvQkY5Us4ZGlg3snI=" class="card-img-top" alt="...">
-                <div class="card-body">
-                    <h4 class="card-title">Dal Batti</h4>
-                    <p class="card-text">Famous Rajasthani dal batti...</p>
-                    <p class="card-text"><strong>$10.99</strong></p>
-                    <a href="#" class="btn btn-primary">Order Now</a>
-                </div>
-            </div>
-        </div>
+    {% endfor %}
     </div>
 </div>
 

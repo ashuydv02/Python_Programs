@@ -19,12 +19,18 @@ class CustomUser(AbstractUser):
         related_query_name='customuser',
     )
 
+class Category(models.Model):
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
+
 class Product(models.Model):
     name = models.CharField(max_length=100)
-    price = models.IntegerField()
+    price = models.IntegerField(default=0)
     description = models.CharField(max_length=100)
-    # image = models.ImageField(upload_to='images/')
-    category = models.CharField(max_length=100)
+    image = models.ImageField(upload_to='images/')
+    category = models.ForeignKey(Category, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.name
@@ -34,12 +40,12 @@ class Cart(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.IntegerField(default=1)
-    price = models.IntegerField(default=0)
+    total_price = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.product.name
+        return (str(self.user) + ':- ' + str(self.product))
 
 
 class Orders(models.Model):
@@ -54,7 +60,7 @@ class Orders(models.Model):
     payment = models.CharField(max_length=100, default='Cash on Delivery')
     
     def __str__(self):
-        return self.user
+        return (str(self.user) + ':- ' + str(self.product))
 
 
 
