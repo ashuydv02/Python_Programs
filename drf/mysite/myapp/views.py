@@ -3,14 +3,15 @@ from django.http import HttpResponse
 from django.views.generic import TemplateView, View
 from .models import Contactus, Cart, Orders, Product, Category
 from django.contrib import messages
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
-from .form import Register_form
+from .form import RegisterForm, CustomChangePasswordForm
+from django.db.models import Sum
 
 class Index(TemplateView):
     template_name = 'index.html'
-    
+
 class Menu(View):
     def get(self, requset):
         products = Product.objects.all()
@@ -22,8 +23,16 @@ class Menu(View):
         product=Product.objects.get(id=id)
         price = request.POST.get('product_price')
         user = request.user
-        Cart.objects.create(user=user,product=product,total_price=price)
-        messages.success(request, "{} added to your cart...".format(product.name))
+        cart = Cart.objects.filter(user=user, product=product)
+        if not cart.exists():
+            Cart.objects.create(user=user,product=product,total_price=price)
+            messages.success(request, "{} added to your cart...".format(product.name))
+        else:
+            cart = cart.first()
+            cart.quantity += 1
+            cart.total_price = int(price) * cart.quantity
+            cart.save()
+            messages.success(request, "{} added to your cart...".format(product.name))
         return redirect('menu')
 
 class About(TemplateView):
@@ -41,15 +50,28 @@ class Contact(View):
         messages.success(request, 'Your message has been sent successfully')
         return redirect('contact')
 
-class Order_view(View):
+class OrderView(View):
+
+    @method_decorator(login_required)
     def get(self, request):
-        return render(request, 'order.html')
+        return redirect('profile')
     
-class Cart_view(View):
+    @method_decorator(login_required)
+    def post(self, request):
+        carts = Cart.objects.filter(user=request.user)
+        for cart in carts:
+            Orders.objects.create(user=cart.user,product=cart.product,quantity=cart.quantity,total=cart.total_price)
+            cart.delete()
+
+        messages.success(request, 'Your order has been placed successfully')
+        return redirect('home')
+
+class CartView(View):
     @method_decorator(login_required)
     def get(self, request):
         cart = Cart.objects.filter(user=request.user)
-        return render(request, 'cart.html', {'cart': cart})
+        total = cart.aggregate(total=Sum('total_price'))
+        return render(request, 'cart.html', {'cart': cart, 'total_price':total})
 
     @method_decorator(login_required)
     def post(self, request):
@@ -62,7 +84,7 @@ class Cart_view(View):
 
 
 # Authentication
-class User_login(View):
+class UserLogin(View):
     def get(self, request):
         return render(request, 'login.html')
     
@@ -78,26 +100,45 @@ class User_login(View):
         messages.error(request, "Wrong User Name or Password")
         return redirect('login')
 
-class User_register(View):
+class UserRegister(View):
     def get(self, request):
         return render(request, 'register.html')
     
     def post(self, request):
-        form = Register_form(request.POST)
+        form = RegisterForm(request.POST)
         if form.is_valid():
             form.save()
             messages.success(request, "Successfully Registered...")
             return redirect('login')
         return render(request, 'register.html', {'form': form})
 
-class User_logout(View):
+class UserLogout(View):
     def get(self, request):
         logout(request)
         messages.success(request, "Successfully Logged out...")
         return redirect('home')
 
-class User_profile(View):
+class UserProfile(View):
     @method_decorator(login_required)
     def get(self, request):
-        return render(request, 'profile.html')
+        user_orders = Orders.objects.filter(user=request.user)
+        return render(request, 'profile.html' ,{'orders': user_orders})
 
+class UserChangePassword(View):
+    template_name = 'change_password.html'
+    form = CustomChangePasswordForm
+
+    @method_decorator(login_required)
+    def get(self, request):
+        return render(request, self.template_name, {'form': self.form})
+
+    @method_decorator(login_required)
+    def post(self, request):
+        form = self.form(request.user, request.POST)
+        if form.is_valid():
+            user = form.save()
+            update_session_auth_hash(request, user)
+            messages.success(request, "Password Changed Successfully...")
+            return redirect('profile')
+        messages.error(request, "Password not Changed...")
+        return render(request, self.template_name, {'form': form})
