@@ -22,4 +22,5 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path('', include("drf_app.urls")),
     path('serializer_type/', include("serializer_type.urls")),
+    path('nested_serializer/', include('nested_serializer.urls')),
 ]
