@@ -4,6 +4,7 @@ from django.contrib.auth.models import User, AbstractUser, Group, Permission
 class CustomUser(AbstractUser):
     phone_number = models.CharField(max_length=10)
     address = models.CharField(max_length=100)
+    image = models.ImageField(upload_to='user_image/', null=True)
     groups = models.ManyToManyField(
         Group,
         related_name='customuser_set',

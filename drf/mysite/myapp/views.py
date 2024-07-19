@@ -1,13 +1,14 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.views.generic import TemplateView, View
-from .models import Contactus, Cart, Orders, Product, Category
+from .models import Contactus, Cart, Orders, Product, CustomUser
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from .form import RegisterForm, CustomChangePasswordForm
 from django.db.models import Sum
+from django.core.files.storage import FileSystemStorage
 
 class Index(TemplateView):
     template_name = 'index.html'
@@ -102,14 +103,26 @@ class UserLogin(View):
 
 class UserRegister(View):
     def get(self, request):
-        return render(request, 'register.html')
+        return render(request, 'register.html', {'form': RegisterForm()})
     
     def post(self, request):
-        form = RegisterForm(request.POST)
+        form_data = request.POST.dict() 
+        image = request.FILES.get('image')
+
+        if image:
+            form_data['image'] = image 
+        form = RegisterForm(form_data, request.FILES)
+
         if form.is_valid():
-            form.save()
+            user = form.save(commit=False)
+            if image:
+                fs = FileSystemStorage()
+                filename = fs.save("user_image/"+image.name, image)
+                user.image = fs.url(filename)
+            user.save()
             messages.success(request, "Successfully Registered...")
             return redirect('login')
+        
         return render(request, 'register.html', {'form': form})
 
 class UserLogout(View):
@@ -123,7 +136,25 @@ class UserProfile(View):
     def get(self, request):
         user_orders = Orders.objects.filter(user=request.user)
         return render(request, 'profile.html' ,{'orders': user_orders})
+    
 
+    @method_decorator(login_required)
+    def post(self, request):
+        username = request.user
+        user = CustomUser.objects.get(username=username)
+        image = request.FILES.get('image')
+        print(image)
+        if image:
+            fs = FileSystemStorage()
+            filename = fs.save("user_image/"+image.name, image)
+            user.image = fs.url(filename)
+            user.save()
+            messages.success(request, "Successfully Updated Profile...")
+            return redirect('profile')
+        else:
+            messages.error(request, "Please Upload Image...")
+            return redirect('profile')
+    
 class UserChangePassword(View):
     template_name = 'change_password.html'
     form = CustomChangePasswordForm

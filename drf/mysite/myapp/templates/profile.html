@@ -7,29 +7,51 @@
         </div>
         <div class="card-body">
             <div class="row">
-                <div class="col-md-6">
-                    <h5><i class="fas fa-user"></i> User Name</h5>
-                    <p>{{ user.username }}</p>
+                <div class="col-md-4">
+                {% if user.image %}
+                    <img src="{{ user.image }}" class="img-fluid rounded-circle" alt="profile" style="display: block;
+                    width: 180px;
+                    height: autopx;">   
+                {% else %}
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="image">Upload Image</label>
+                        <input type="file" class="form-control-file" id="image" accept="image/*" name="image">
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary">Upload</button>
+                    </div>
+                </form>
+                {% endif %}
                 </div>
-                <div class="col-md-6">
-                    <h5><i class="fas fa-signature"></i> First Name</h5>
-                    <p>{{ user.first_name }}</p>
-                </div>
-                <div class="col-md-6">
-                    <h5><i class="fas fa-signature"></i> Last Name</h5>
-                    <p>{{ user.last_name }}</p>
-                </div>
-                <div class="col-md-6">
-                    <h5><i class="fas fa-envelope"></i> Email</h5>
-                    <p>{{ user.email }}</p>
-                </div>
-                <div class="col-md-6">
-                    <h5><i class="fas fa-phone"></i> Phone Number</h5>
-                    <p>{{ user.phone_number }}</p>
-                </div>
-                <div class="col-md-6">
-                    <h5><i class="fas fa-home"></i> Address</h5>
-                    <p>{{ user.address }}</p>
+                <div class="col-md-8">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5><i class="fas fa-user"></i> User Name</h5>
+                            <p>{{ user.username }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h5><i class="fas fa-signature"></i> First Name</h5>
+                            <p>{{ user.first_name }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h5><i class="fas fa-signature"></i> Last Name</h5>
+                            <p>{{ user.last_name }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h5><i class="fas fa-envelope"></i> Email</h5>
+                            <p>{{ user.email }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h5><i class="fas fa-phone"></i> Phone Number</h5>
+                            <p>{{ user.phone_number }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h5><i class="fas fa-home"></i> Address</h5>
+                            <p>{{ user.address }}</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

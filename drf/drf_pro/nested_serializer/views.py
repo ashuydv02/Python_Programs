@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from rest_framework.views import APIView
+from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework import status
 from .models import Book, Author, Blocklist
@@ -8,6 +9,7 @@ from rest_framework import permissions
 
 from django.core.cache import cache
 from rest_framework.throttling import AnonRateThrottle, UserRateThrottle
+from rest_framework.filters import SearchFilter
 
 # Example of Caching
 class CachedDataView(APIView):
@@ -49,17 +51,10 @@ class BookView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 # Example of throttling
-class AuthorView(APIView):
+class AuthorView(generics.ListCreateAPIView):
     throttle_classes = [AnonRateThrottle]
-    def get(self, request):
-        authors = Author.objects.all()
-        serializer = AuthorSerializer(authors, many=True)
-        return Response(serializer.data,status=status.HTTP_202_ACCEPTED)
-    
-    def post(self, request):
-        serializer = AuthorSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+    filter_backends = [SearchFilter]
+    search_fields = ["name", "books__title"]
+    queryset = Author.objects.all()
+    serializer_class = AuthorSerializer
+

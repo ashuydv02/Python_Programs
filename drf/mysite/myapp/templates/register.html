@@ -5,7 +5,7 @@
     <div class="card">
         <div class="card-body">
             <h3 class="card-title text-center">User Registration Form</h3>
-            <form method="post">
+            <form method="post" enctype="multipart/form-data">
                 {% csrf_token %}
                 
                 {% if form %}
@@ -19,7 +19,10 @@
                         {% endif %}
                     {% endfor %}
                 {% endif %}
-                
+                <div class="form-group">
+                    <label for="exampleInputimage"><i class="fas fa-image"></i> User Profile</label>
+                    <input type="file" class="form-control" name="image" id="exampleInputimage" accept="image/*" required>
+                </div>
                 <div class="form-group">
                     <label for="exampleInputUsername"><i class="fas fa-user"></i> User Name</label>
                     <input type="text" class="form-control" name="username" id="exampleInputUsername" placeholder="Username" required>

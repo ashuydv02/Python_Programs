@@ -42,6 +42,8 @@ INSTALLED_APPS = [
     'drf_app',
     'serializer_type',
     'nested_serializer',
+    'filter',
+    'django_filters',
 ]
 
 MIDDLEWARE = [
@@ -137,10 +139,10 @@ REST_FRAMEWORK = {
         # 'rest_framework.authentication.TokenAuthentication',
     ],
     'DEFAULT_THROTTLE_RATES': {
-        'anon': '5/minute',
-        'user': '10/minute',
+        'anon': '50/minute',
+        'user': '100/minute',
     }
-}
+}   
 
 
 CACHES = {
