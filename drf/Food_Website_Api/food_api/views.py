@@ -1,5 +1,6 @@
 from rest_framework import generics
-
+from rest_framework.views import APIView
+from rest_framework.response import Response
 from .serializers import *
 from .models import *
 
@@ -18,19 +19,23 @@ class CategoryView(generics.ListCreateAPIView):
     serializer_class = CategorySerializer
 
 
-class CategoryViewDetails(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Category.objects.all()
-    serializer_class = CategorySerializer
+class CartView(APIView):
+    def get(self, request):
+        cart = Cart.objects.get(user=request.user)
+        if cart is None:
+            return Response({'message': 'Cart not found'})
+        serializer = CartSerializer(cart)
+        return Response(serializer.data)
 
-
-class CartView(generics.ListCreateAPIView):
-    queryset = Cart.objects.all()
-    serializer_class = CartSerializer
-
-
-class CartViewDetails(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Cart.objects.all()
-    serializer_class = CartSerializer
+    def post(self, request):
+        product = Product.objects.get(id=request.data['id'])
+        cart = Cart.objects.get(user=request.user)
+        if cart is None:
+            cart = Cart.objects.create(user=request.user)
+            cart.products.add(product)
+            cart.save()
+            return Response({'message': 'Product added to cart'})
+        return Response({'message': 'Product added to cart'})
 
 
 class OrderView(generics.ListCreateAPIView):
@@ -49,10 +54,5 @@ class UserView(generics.ListCreateAPIView):
 
 
 class ContactusView(generics.ListCreateAPIView):
-    queryset = Contactus.objects.all()
-    serializer_class = ContactusSerializer
-
-
-class ContactusViewDetails(generics.ListCreateAPIView):
     queryset = Contactus.objects.all()
     serializer_class = ContactusSerializer

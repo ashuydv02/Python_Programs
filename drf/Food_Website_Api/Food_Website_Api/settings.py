@@ -131,3 +131,6 @@ REST_FRAMEWORK = {
 }
 
 CORS_ALLOW_ALL_ORIGINS = True
+
+
+AUTH_USER_MODEL='food_api.CustomUser'
