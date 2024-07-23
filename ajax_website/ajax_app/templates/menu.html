@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div id="response">
+
+</div>
+
+<div class="container my-5">
+    <h2 class="text-center mb-4">Our Menu</h2>
+    <div class='row'>
+    {% for product in products %}
+        <div class="col-md-3 mb-3">
+            <div class="card">
+                <img class="img-thumbnail fixed-size-img" src="{{product.image.url}}" class="card-img-top" alt="...">
+                <div class="card-body">
+                    <h4 class="card-title">{{product.name}}</h4>
+                    <p class="card-text">{{product.description}}</p>
+                    <p class="card-text"><strong>{{product.price}}</strong></p>
+                    <form class="cart_form" data-product-id="{{product.id}}">
+                        {% csrf_token %}
+                        <input type='hidden' id="product_id" name='product_id' value='{{product.id}}'>
+                        <button type='submit' class="btn btn-primary">Add TO Cart</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+    </div>
+</div>
+
+{% endblock %}
+
+{% block script %}
+<script>
+    $(document).ready(function(){
+        $(document).on("submit", ".cart_form", function(event){
+            event.preventDefault();
+            var form = $(this);
+            var formData = {
+                id: form.data("product-id"),
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+            };
+            $.ajax({
+                url: "{% url 'cart' %}",
+                type: "POST",
+                data: formData,
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                success: function(response){
+                    $("#response").html('<div class="alert alert-success">Successfully added to cart...</div>');
+                },
+                error: function(xhr, status, error){
+                    $("#response").html('<div class="alert alert-danger">An error occurred: ' + xhr.responseText + '</div>');
+                }
+            });
+        });
+    });
+</script>
+
+{% endblock %}

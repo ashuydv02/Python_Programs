@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="jumbotron jumbotron-fluid text-center">
+    <div class="container">
+        <h1 class="display-4">Welcome to Get Your Food</h1>
+        <p class="lead">Delicious food delivered to your doorstep.</p>
+        <a class="btn btn-primary btn-lg" href="{% url 'menu' %}" role="button">Order Now</a>
+    </div>
+</div>
+
+<div class="container my-5">
+    <h2 class="text-center mb-4">Our Menu</h2>
+    <div class='row'>
+    {% for product in products %}
+        <div class="col-md-3 mb-3">
+            <div class="card">
+                <img class="img-thumbnail fixed-size-img" src="{{product.image.url}}" class="card-img-top" alt="...">
+                <div class="card-body">
+                    <h4 class="card-title">{{product.name}}</h4>
+                    <p class="card-text">{{product.description}}</p>
+                    <p class="card-text"><strong>{{product.price}}</strong></p>
+                    <a href="{% url 'menu' %}"><button type='button' class="btn btn-primary">Order Now</button></a>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+    </div>
+</div>
+
+
+{% endblock %}
