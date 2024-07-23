@@ -14,38 +14,43 @@
     </div>
 
     <script>
-        const xhttp = new XMLHttpRequest();
-        xhttp.onload = function() {
-            var menu = document.getElementById("food-menu");
-            var products = JSON.parse(this.responseText);
-            products.forEach(function(product) {
-                var productHtml = `
-                    <div class="col-md-4">
-                        <div class="card mb-4">
-                            <img src="${product.image}" class="card-img-top" alt="${product.name}">
-                            <div class="card-body">
-                                <h5 class="card-title">${product.name}</h5>
-                                <p class="card-text">${product.description}</p>
-                                <p class="card-text"><strong>$${product.price}</strong></p>
+        $(document).ready(function(){
+            const user = 'developer';
+            const password = 'qwerty@123';
+            const credentials = btoa(user + ':' + password);
+        
+            $.ajax({
+                url: "http://127.0.0.1:8000/api/",
+                type: "GET",
+                headers: {
+                    'Authorization': 'Basic ' + credentials
+                },
+                success: function(response) {
+                    var menu = $("#food-menu");
+                    var products = response;
+                    products.forEach(function(product) {
+                        var productHtml = `
+                            <div class="col-md-4">
+                                <div class="card mb-4">
+                                    <img src="${product.image}" class="card-img-top" alt="${product.name}">
+                                    <div class="card-body">
+                                        <h5 class="card-title">${product.name}</h5>
+                                        <p class="card-text">${product.description}</p>
+                                        <p class="card-text"><strong>$${product.price}</strong></p>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                    </div>
-                `;
-                var tempDiv = document.createElement('div');
-                tempDiv.innerHTML = productHtml;
-                while (tempDiv.firstChild) {
-                    menu.appendChild(tempDiv.firstChild);
+                        `;
+                        menu.append(productHtml);
+                    });
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    console.error("AJAX request failed: " + textStatus + ", " + errorThrown);
                 }
             });
-        }
-        xhttp.open("GET", "http://127.0.0.1:8000/api/", true);
-        const user = 'developer';
-        const password = 'developer';
-        const credentials = btoa(user + ':' + password);
-        xhttp.setRequestHeader('Authorization', 'Basic ' + credentials);
-
-        xhttp.send();
-    </script>
+        });
+        </script>
+        
 </body>
 </html>
 
