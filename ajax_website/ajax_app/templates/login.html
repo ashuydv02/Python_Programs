@@ -2,7 +2,7 @@
 
 {% block content %}
 <br><br><br>
-<div class="response"></div>
+<div id="response"></div>
 <form id="login_form" class="col-md-6 mx-auto">
     {% csrf_token %}
     <div class="card">
@@ -23,7 +23,7 @@
             <button type="submit" class="btn btn-primary btn-block">Login</button>
             
             <div class="text-center mt-3">
-                <a href="#" class="btn btn-link">New User? Register Here</a>
+                <a href="{% url 'register' %}" class="btn btn-link">New User? Register Here</a>
             </div>
         </div>
     </div>

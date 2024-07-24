@@ -41,7 +41,7 @@
                 csrfmiddlewaretoken: '{{ csrf_token }}'
             };
             $.ajax({
-                url: "{% url 'cart' %}",
+                url: "{% url 'addcart' %}",
                 type: "POST",
                 data: formData,
                 headers: {

@@ -85,10 +85,6 @@ class Orders(models.Model):
     def __str__(self):
         return (str(self.user) + ':- ' + str(self.product))
 
-    def save(self, *args, **kwargs):
-        self.total = self.quantity * self.product.price
-        super(Cart, self).save(*args, **kwargs)
-
 
 class Contactus(models.Model):
     name = models.CharField(max_length=100)

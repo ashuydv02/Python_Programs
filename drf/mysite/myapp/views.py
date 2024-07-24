@@ -136,7 +136,7 @@ class UserProfile(View):
     def get(self, request):
         user_orders = Orders.objects.filter(user=request.user)
         return render(request, 'profile.html' ,{'orders': user_orders})
-    
+
 
     @method_decorator(login_required)
     def post(self, request):
