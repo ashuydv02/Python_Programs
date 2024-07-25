@@ -53,26 +53,35 @@ class CartViewApi(APIView):
         try:
             cart = Cart.objects.get(id=id)
             cart.delete()
-            return Response({'message': 'Item is removed...'}, status=status.HTTP_200_OK)
+
+            cart = Cart.objects.filter(user=request.user)
+            total = cart.aggregate(total=Sum('total_price'))
+            return Response({'message': 'Product removed from cart', 'total': total['total']},
+                            status=status.HTTP_200_OK)
         
         except Cart.DoesNotExist:
             return Response({'message': 'Cart item is not found'}, status=status.HTTP_200_OK)
 
-    def update(self, request, id):
-        quantity = request.data.get('quantity')
-        if not id:
-            return Response({'error': 'Product ID is required'}, status=status.HTTP_400_BAD_REQUEST)
-        if not quantity:
-            return Response({'error': 'Quantity is required'}, status=status.HTTP_400_BAD_REQUEST)
-        
-        try:
-            cart = Cart.objects.get(id=id)
-            cart.quantity = quantity
-            cart.save()
-            return Response({'message': 'Product quantity updated'}, status=status.HTTP_200_OK)
 
+class UpdateCartViewApi(APIView):
+    def put(self, request, id, format=None):
+        try:
+            cart_item = Cart.objects.get(id=id)
         except Cart.DoesNotExist:
-            return Response({'error': 'Cart not found'}, status=status.HTTP_404_NOT_FOUND)
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+        serializer = CartSerializer(cart_item, data=request.data, partial=True)
+        if serializer.is_valid():
+            updated_item = serializer.save()
+            cart = Cart.objects.filter(user=request.user)
+            total = cart.aggregate(total=Sum('total_price'))
+            response_data = {
+                'quantity': updated_item.quantity,
+                'price': updated_item.total_price,
+                'total_price': total,
+            }
+            return Response(response_data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 
 class OrderViewApi(APIView):

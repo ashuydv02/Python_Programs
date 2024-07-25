@@ -11,18 +11,18 @@
 
                 <div class="list-group-item d-flex justify-content-between align-items-center cart-item">
                     <div class="d-flex align-items-center">
-                        <img class="img-fluid rounded-start" src="{{item.product.image.url}}" alt="..." style='width:200px;height:150px;'>
-                        <div class="ms-3">
-                            <h5 class="mb-1">{{item.product.name}}</h5>
+                        <img class="img-fluid rounded-circle" src="{{item.product.image.url}}" alt="..." style='width:180px;height:150px;'>
+                        <div class="ms-3 ml-4">
+                            <h5 class="mb-1"><b>{{item.product.name}}</b></h5>
                             <p class="mb-1">{{item.product.description}}</p>
-                            <div class="input-group input-group-sm">
+                            <div class="input-group input-group">
                                 <span class="input-group-text">Quantity</span>
-                                <input type="number" class="form-control cart-quantity" data-id="{{item.id}}" value="{{item.quantity}}">
+                                <input type="number" class="form-control cart-quantity" data-id="{{item.id}}" value="{{item.quantity}}" min="1">
                             </div>
                         </div>
                     </div>
                     <div class="text-end">
-                        <h5 class="mb-1">{{item.total_price}}/-</h5>
+                        <h5 class="mb-1 cart-item-price">{{item.total_price}}/-</h5>
                         <button class="btn btn-danger btn-sm remove_cart" data-id="{{item.id}}">Remove</button>
                     </div>
                 </div>
@@ -36,10 +36,10 @@
             <div class="card">
                 <div class="card-body">
                     <h5 class="card-title">Your Bucket Summary</h5>
-                    <p class="card-text">Subtotal: {{total_price.total}}/-</p>
+                    <p class="card-text" >Subtotal: <span id="subtotal">{{total_price.total}}</span>/-</p>
                     <p class="card-text">Tax: 30/-</p>
                     <p class="card-text">Discount: 30/-</p>
-                    <p class="card-text"><strong>Total: {{total_price.total}}/-</strong></p>
+                    <p class="card-text" ><strong>Total: <span id="total_price">{{total_price.total}}</span>/-</strong></p>
                     <form id="order_form">
                         {% csrf_token %}
                         <button type="submit" class="btn btn-primary btn-block">Proceed to Checkout</button>
@@ -62,13 +62,15 @@
             var cartId = $(this).data('id');
             var cartItemElement = $(this).closest('.cart-item');
             $.ajax({
-                url: "{% url 'updatecart' 1 %}".replace('1', cartId),
+                url: "{% url 'deletecart' 1 %}".replace('1', cartId),
                 type: "DELETE",
                 headers: {
                     'X-CSRFToken': '{{ csrf_token }}'
                 },
                 success: function(response){
                     cartItemElement.remove();
+                    $("#total_price").text(response.total);
+                    $("#subtotal").text(response.total);
                     $("#response").html('<div class="alert alert-success">Your cart is removed...</div>');
                     if ($('#cart-items').children().length === 0) {
                         $("#response").html('<div class="alert alert-success">Your cart is empty</div>');
@@ -102,29 +104,33 @@
 
         $(document).on("change", ".cart-quantity", function(event){
             event.preventDefault();
-            var cartId = $(this).data('id');
-            var quantity = $(this).val();
             var cartItemElement = $(this).closest('.cart-item');
+            var cartId = $(this).data('id');
+            var fdata = JSON.stringify({
+                quantity: $(this).val(),
+            });
+
             $.ajax({
                 url: "{% url 'updatecart' 1 %}".replace('1', cartId),
                 type: 'PUT',
-                data: {
-                'quantity': quantity,
-                'csrfmiddlewaretoken': '{{ csrf_token }}'
-                },
-                processData: false,
-                contentType: false,
+                data: fdata,
+                contentType: 'application/json',
                 headers: {
                     'X-CSRFToken': '{{ csrf_token }}'
                 },
                 success: function(response){
-                    $("#response").html('<div class="alert alert-success">User successfully updated...</div>');
+                    cartItemElement.find('.cart-item-price').text(response.price + '/-');
+                    cartItemElement.find('.cart-quantity').val(response.quantity);
+                    $("#total_price").text(response.total_price.total);
+                    $("#subtotal").text(response.total_price.total);
+                    $("#response").html('<div class="alert alert-success">Quantity successfully updated...</div>');
                 },
                 error: function(xhr, status, error){
                     $("#response").html('<div class="alert alert-danger">' + error + xhr.responseText + '</div>');
-                }
+                },
             });
         });
+
     });
 </script>
 
