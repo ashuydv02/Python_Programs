@@ -1,0 +1,12 @@
+.flake8
+python/main.py
+python/tempFile.txt
+python/pyproject.toml
+__pycache__/
+python/directoryManagementByOsModule.py
+python/pickling.txt
+numpy/prac.ipynb
+pandas/data.csv
+pyproject.toml
+virtualEnvironment
+python/validating_mail.py
