@@ -84,11 +84,13 @@ The repository is organized as follows:
 ├── Django_Projects/        # Web applications using Django
 ├── DRF_Projects/           # APIs built with Django Rest Framework
 └── AJAX_Programs/          # Web programs using AJAX
-
+```
 
 ## Dependencies
 All necessary dependencies are listed in the requirements.txt file. Install them using:
+```bash
   pip install -r requirements.txt
+```
 
 ## Contributing
 Contributions are welcome! Feel free to fork this repository, make your changes, and submit a pull request.
