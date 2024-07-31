@@ -74,6 +74,9 @@ For Django projects, navigate to the project directory and use:
 
 ## Project Structure
 
+The repository is organized as follows:
+
+```plaintext
 .
 ├── Core_Python_Programs/   # Basic Python programs
 ├── NumPy_Programs/         # Programs using NumPy library
@@ -81,6 +84,7 @@ For Django projects, navigate to the project directory and use:
 ├── Django_Projects/        # Web applications using Django
 ├── DRF_Projects/           # APIs built with Django Rest Framework
 └── AJAX_Programs/          # Web programs using AJAX
+
 
 ## Dependencies
 All necessary dependencies are listed in the requirements.txt file. Install them using:
