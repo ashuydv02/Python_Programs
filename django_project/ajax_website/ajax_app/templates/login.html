@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<br><br><br>
+<div id="response"></div>
+<form id="login_form" class="col-md-6 mx-auto">
+    {% csrf_token %}
+    <div class="card">
+        <div class="card-body">
+            <h3 class="card-title text-center">Login</h3>
+            <p class="text-center">Welcome back! Please login to your account.</p>
+            
+            <div class="form-group">
+                <label for="username"><i class="fas fa-user"></i> Username</label>
+                <input type="text" name="username" class="form-control" id="username" placeholder="Enter your username" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="password"><i class="fas fa-lock"></i> Password</label>
+                <input type="password" name="password" class="form-control" id="password" placeholder="Enter your password" required>
+            </div>
+            
+            <button type="submit" class="btn btn-primary btn-block">Login</button>
+            
+            <div class="text-center mt-3">
+                <a href="{% url 'register' %}" class="btn btn-link">New User? Register Here</a>
+            </div>
+        </div>
+    </div>
+</form>
+<br>
+
+{% endblock %}
+
+{% block script %}
+<script>
+    $(document).ready(function(){
+        $(document).on("submit", "#login_form", function(event){
+            event.preventDefault();
+            var formData = {
+                name: $('#username').val(),
+                password: $('#password').val(),
+            };
+            $.ajax({
+                url: "{% url 'authenticate' %}",
+                type: "POST",
+                data: formData,
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                success: function(response){
+                    $("#response").html('<div class="alert alert-success">Successfully logged in...</div>');
+                    window.location.href = "{% url 'home' %}";
+                },
+                error: function(xhr, status, error){
+                    $("#response").html('<div class="alert alert-danger"> Username or password is wrong... </div>');
+                }
+            });
+        });
+    });
+</script>
+
+{% endblock %}
