@@ -23,5 +23,6 @@ urlpatterns = [
     path('', include("drf_app.urls")),
     path('serializer_type/', include("serializer_type.urls")),
     path('nested_serializer/', include('nested_serializer.urls')),
+    path('nested_routers/', include('nested_routers.urls')),
     path('filters/', include('filter.urls')),
 ]

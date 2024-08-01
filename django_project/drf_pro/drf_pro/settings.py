@@ -43,13 +43,18 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+
     'rest_framework',
     'rest_framework.authtoken',
+
     'drf_app',
     'serializer_type',
     'nested_serializer',
     'filter',
+    'nested_routers',
+
     'django_filters',
+
 ]
 
 MIDDLEWARE = [
