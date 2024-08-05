@@ -51,7 +51,13 @@
                     $("#response").html('<div class="alert alert-success">Successfully added to cart...</div>');
                 },
                 error: function(xhr, status, error){
-                    $("#response").html('<div class="alert alert-danger">An error occurred: ' + xhr.responseText + '</div>');
+                    if (xhr.responseText == `{"detail":"Authentication credentials were not provided."}`) {
+                        $("#response").html('<div class="alert alert-danger">Please Login first...</div>');
+                       // window.location.href = ` {% url 'login' %} `;
+                    }
+                    else{
+                        $("#response").html('<div class="alert alert-danger">An error occurred: ' + xhr.responseText + '</div>');
+                    }
                 }
             });
         });
