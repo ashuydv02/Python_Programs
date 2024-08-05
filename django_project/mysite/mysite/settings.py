@@ -19,7 +19,12 @@ SECRET_KEY = env('DJANGO_SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
+
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:8000',
+    'https://1457-60-254-111-210.ngrok-free.app'
+]
 
 
 # Application definition
@@ -130,3 +135,9 @@ LOGIN_URL = 'login'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+AUTHENTICATION_BACKENDS = [
+    'myapp.backends.custom_auth_backend.EmailBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
+

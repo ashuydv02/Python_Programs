@@ -1,24 +1,12 @@
 from django.db import models
-from django.contrib.auth.models import User, AbstractUser, Group, Permission
+from django.contrib.auth.models import AbstractUser
 
 class CustomUser(AbstractUser):
+    email = models.EmailField(unique=True)
     phone_number = models.CharField(max_length=10)
     address = models.CharField(max_length=100)
     image = models.ImageField(upload_to='user_image/', null=True)
-    groups = models.ManyToManyField(
-        Group,
-        related_name='customuser_set',
-        blank=True,
-        help_text=('The groups this user belongs to. A user will get all permissions granted to each of their groups.'),
-        related_query_name='customuser',
-    )
-    user_permissions = models.ManyToManyField(
-        Permission,
-        related_name='customuser_set',
-        blank=True,
-        help_text=('Specific permissions for this user.'),
-        related_query_name='customuser',
-    )
+
 
 class Category(models.Model):
     name = models.CharField(max_length=100)

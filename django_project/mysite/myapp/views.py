@@ -10,8 +10,10 @@ from .form import RegisterForm, CustomChangePasswordForm
 from django.db.models import Sum
 from django.core.files.storage import FileSystemStorage
 
+
 class Index(TemplateView):
     template_name = 'index.html'
+
 
 class Menu(View):
     def get(self, requset):
@@ -36,8 +38,10 @@ class Menu(View):
             messages.success(request, "{} added to your cart...".format(product.name))
         return redirect('menu')
 
+
 class About(TemplateView):
     template_name = 'about.html'
+
 
 class Contact(View):
     def get(self, request):
@@ -50,6 +54,7 @@ class Contact(View):
         Contactus.objects.create(name=name, email=email, message=message)
         messages.success(request, 'Your message has been sent successfully')
         return redirect('contact')
+
 
 class OrderView(View):
 
@@ -66,6 +71,7 @@ class OrderView(View):
 
         messages.success(request, 'Your order has been placed successfully')
         return redirect('home')
+
 
 class CartView(View):
     @method_decorator(login_required)
@@ -90,16 +96,17 @@ class UserLogin(View):
         return render(request, 'login.html')
     
     def post(self, request):
-        username = request.POST.get('username')
+        email = request.POST.get('email')
         password = request.POST.get('password')
         next_url = request.GET.get('next')
-        user = authenticate(request, username=username, password=password)
+        user = authenticate(request, email=email, password=password)
         if user is not None:
             login(request, user)
             messages.success(request, "Successfully Logged in...")
             return redirect(next_url or 'home')
         messages.error(request, "Wrong User Name or Password")
         return redirect('login')
+
 
 class UserRegister(View):
     def get(self, request):
@@ -125,11 +132,13 @@ class UserRegister(View):
         
         return render(request, 'register.html', {'form': form})
 
+
 class UserLogout(View):
     def get(self, request):
         logout(request)
         messages.success(request, "Successfully Logged out...")
         return redirect('home')
+
 
 class UserProfile(View):
     @method_decorator(login_required)
@@ -155,6 +164,7 @@ class UserProfile(View):
             messages.error(request, "Please Upload Image...")
             return redirect('profile')
     
+
 class UserChangePassword(View):
     template_name = 'change_password.html'
     form = CustomChangePasswordForm
