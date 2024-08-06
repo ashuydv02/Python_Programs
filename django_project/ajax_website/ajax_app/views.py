@@ -11,6 +11,8 @@ from django.db.models import Sum
 from django.core.files.storage import FileSystemStorage
 from django.contrib.auth.mixins import LoginRequiredMixin
 
+from django.core.mail import send_mail
+from django.conf import settings
 
 class HomeView(generic.TemplateView):
     template_name = "index.html"
@@ -94,7 +96,6 @@ class OrderViewApi(APIView):
         carts = Cart.objects.filter(user=user)
         if not carts.exists():
             return Response({'error': 'Cart is empty'}, status=status.HTTP_400_BAD_REQUEST)
-
         for cart in carts:
             Orders.objects.create(
                 user=user, 
