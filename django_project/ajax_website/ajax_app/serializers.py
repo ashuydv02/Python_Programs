@@ -13,16 +13,21 @@ class CartSerializer(serializers.ModelSerializer):
 
 
 class RegisterSerializer(serializers.ModelSerializer):
+    otp = serializers.CharField(write_only=True)
+    verification_code = serializers.CharField(write_only=True, required=False)
     password1 = serializers.CharField(write_only=True)
     password2 = serializers.CharField(write_only=True)
 
     class Meta:
         model = CustomUser
-        fields = ('username', 'first_name', 'last_name', 'email', 'phone_number', 'address', 'password1', 'password2', 'image')
+        fields = ('username', 'first_name', 'last_name', 'email', 'otp', 'phone_number', 'address', 'password1', 'password2', 'image', 'verification_code')
 
     def validate(self, data):
+        if data['otp'] != data['verification_code']:
+            raise serializers.ValidationError({'message': "Please Enter Correct Verification code."})
+        
         if data['password1'] != data['password2']:
-            raise serializers.ValidationError("Passwords do not match.")
+            raise serializers.ValidationError({'message': "Passwords do not match."})
         return data
 
     def create(self, validated_data):

@@ -1,31 +1,33 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="jumbotron jumbotron-fluid text-center">
+
+<section class="hero-section text-center text-white" style="background-image: url('/static/ajax_app/images.jpeg'); background-size: cover; background-position: center;">
+    <div class="container py-5">
+        <h1 class="display-4 font-weight-bold">Welcome to Get Your Food</h1>
+        <p class="lead">Delicious food delivered to your doorstep, fresh and fast.</p>
+        <a class="btn btn-warning btn-lg mt-3" href="{% url 'menu' %}" role="button">Explore</a>
+    </div>
+</section>
+
+
+<section class="inspiration-section py-5">
     <div class="container">
-        <h1 class="display-4">Welcome to Get Your Food</h1>
-        <p class="lead">Delicious food delivered to your doorstep.</p>
-        <a class="btn btn-primary btn-lg" href="{% url 'menu' %}" role="button">Order Now</a>
-    </div>
-</div>
-
-<div class="container my-5">
-    <h2 class="text-center mb-4">Our Menu</h2>
-    <div class='row'>
-    {% for product in products %}
-        <div class="col-md-3 mb-3">
-            <div class="card">
-                <img class="img-thumbnail fixed-size-img" src="{{product.image.url}}" class="card-img-top" alt="...">
-                <div class="card-body">
-                    <h4 class="card-title">{{product.name}}</h4>
-                    <p class="card-text">{{product.description|truncatechars:28}}</p>
-                    <p class="card-text"><strong>{{product.price}}</strong></p>
-                    <a href="{% url 'menu' %}"><button type='button' class="btn btn-primary">Order Now</button></a>
+        <h2 class="text-left font-weight-bold mb-4">Inspiration for your Orders</h2>
+        <div class="row">
+            {% for product in products %}
+                <div class="col-sm-6 col-md-4 col-lg-3 mb-4">
+                    <a href="{% url 'menu' %}" class="text-decoration-none text-dark">
+                        <div class="">
+                            <img src="{{ product.image.url }}" class="rounded-circle" alt="{{ product.name }}" style="width: 150px; height: 150px; object-fit: cover;">
+                            <div class="card-body text-left">
+                                <h5 class="card-title"><b>{{ product.name }}</b></h5>
+                            </div>
+                        </div>
+                    </a>
                 </div>
-            </div>
+            {% endfor %}
         </div>
-    {% endfor %}
     </div>
-</div>
-
+</section>
 
 {% endblock %}

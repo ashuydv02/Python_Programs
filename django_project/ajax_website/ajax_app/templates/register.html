@@ -33,8 +33,18 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="email"><i class="fas fa-envelope"></i> Email</label>
-                    <input type="email" name="email" class="form-control" id="email" placeholder="E-mail" required>
+                    <div class="row">
+                        <div class="col-6">
+                            <label for="email"><i class="fas fa-envelope"></i> Email</label>
+                            <input type="email" name="email" class="form-control" id="email" placeholder="E-mail" required>
+                        </div>
+                        <div class="col-6">
+                            <label for="mail_verification" id="verify_label">&nbsp;</label>
+                            <div id="varification_field">
+                                <button id="mail_verification" class="btn btn-success">Verify Mail</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="form-group">
@@ -71,27 +81,79 @@
 {% block script %}
 <script>
     $(document).ready(function(){
+        let varify = 0;
         $(document).on("submit", "#register_form", function(event){
             event.preventDefault();
-            var form = $('#register_form')[0];
-            var formData = new FormData(form); 
-            $.ajax({
-                url: "{% url 'registerapi' %}",
-                type: "POST",
-                data: formData,
-                processData: false,
-                contentType: false,
-                headers: {
-                    'X-CSRFToken': '{{ csrf_token }}'
-                },
-                success: function(response){
-                    $("#response").html('<div class="alert alert-success">' + response + '</div>');
-                    window.location.href = "{% url 'login' %}";
-                },
-                error: function(xhr, status, error){
-                    $("#response").html('<div class="alert alert-danger">' + error + '</div>');
+            if(varify == 1){
+                var form = $('#register_form')[0];
+                var formData = new FormData(form); 
+                alert("Verifying your details Please wait...")
+                $.ajax({
+                    url: "{% url 'registerapi' %}",
+                    type: "POST",
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    success: function(response){
+                        $("#response").html('<div class="alert alert-success">' + response + '</div>');
+                        window.location.href = "{% url 'login' %}";
+                    },
+                    error: function(xhr, status, error){
+                        if(xhr.responseJSON.message ){
+                            $("#response").html('<div class="alert alert-danger">' + xhr.responseJSON.message + '</div>');
+                        }
+                        else{
+                            $("#response").html('<div class="alert alert-danger">' + xhr.responseText + '</div>');
+                        }
+                    }
+                });
+            }
+            else{
+                $("#response").html('<div class="alert alert-danger">Please verify your email first.</div>');
+                alert('Please verify your email first.');
+            }
+        });
+        $(document).on("click", "#mail_verification", function(event){
+            event.preventDefault();
+            if(varify == 0){
+                alert("Verifiying Please wait for couple of seconds...");
+                var mail = $('#email').val();
+                if(mail){
+                    $.ajax({
+                        url: "{% url 'send_verification_code' %}",
+                        type: "POST",
+                        data: {'email': mail},
+                        headers: {
+                            'X-CSRFToken': '{{ csrf_token }}'
+                        },
+                        success: function(response){
+                            alert(response.message);
+                            $("#varification_field").html(`
+                                <input type="text" name="otp" class="form-control" id="otp" placeholder="Enter Your Verification Code" required>
+                                `
+                            );
+                            varify = 1;
+                            $('#email').prop('read_only', true);
+                            $('#verify_label').html(
+                                "<b>&nbspEnter Otp</b>"
+                            );
+                            $('#verify_label').addClass('fas fa-lock')
+                        },
+                        error: function(xhr, status, error){
+                            alert(xhr.responseJSON.message);
+                        }
+                    });
                 }
-            });
+                else{
+                    alert("Please enter your mail...");
+                }
+            }
+            else{
+                alert('You have already verified your email.');
+            }
         });
     });
 </script>

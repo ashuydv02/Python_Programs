@@ -11,8 +11,11 @@ from django.db.models import Sum
 from django.core.files.storage import FileSystemStorage
 from django.contrib.auth.mixins import LoginRequiredMixin
 
-from django.core.mail import send_mail
+from django.core.mail import send_mail, BadHeaderError
+from smtplib import SMTPException
 from django.conf import settings
+import random
+
 
 class HomeView(generic.TemplateView):
     template_name = "index.html"
@@ -165,12 +168,16 @@ class RegisterView(generic.TemplateView):
 class RegisterViewApi(APIView):
     permission_classes = [permissions.AllowAny]
     def post(self, request):
-        serializer = RegisterSerializer(data=request.data)
+        data = request.data.copy()
+        data['verification_code'] = request.session.get('verification_code')
+        serializer = RegisterSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
+            del request.session['verification_code']
             messages.success(request, "Successfully Registered...")
             return Response({'message': "Successfully Registered"}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class ProfileView(LoginRequiredMixin, generic.View):
     template_name = 'profile.html'
@@ -194,3 +201,31 @@ class ProfileView(LoginRequiredMixin, generic.View):
         else:
             messages.error(request, "Please Upload Image...")
             return redirect('profile')
+
+
+class Send_Verification_Code(APIView):
+    permission_classes = []
+
+    def post(self, request):
+        email = request.data.get('email')
+        if CustomUser.objects.filter(email=email).exists():
+                return Response({'message': "Email is already verified and exists"}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            code = str(random.randint(100000, 999999))
+            try:
+                mail_content = "Your Verification Code is: "+code
+                send_mail(
+                    "Mail Verification Code",
+                    mail_content,
+                    settings.DEFAULT_FROM_EMAIL,
+                    [email],
+                )
+                request.session['verification_code'] = code
+                return Response({'message': "Verification Code Sent Successfully"}, status=status.HTTP_200_OK)
+            except BadHeaderError:
+                return Response({'message': "Something Went Wrong Please try Again."}, status=status.HTTP_400_BAD_REQUEST)
+            except SMTPException as e:
+                return Response({'message': "Something Went Wrong Please Try Again."}, status=status.HTTP_400_BAD_REQUEST)
+            except Exception as e:
+                return Response({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
