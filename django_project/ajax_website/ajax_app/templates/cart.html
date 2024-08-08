@@ -21,7 +21,7 @@
                         </div>
                     </div>
                     <div class="text-end">
-                        <h5 class="mb-1 cart-item-price">{{ item.total_price }}/-</h5>
+                        <h5 class="mb-1 cart-item-price">{{ item.product.price }}/-</h5>
                         <button class="btn btn-danger btn-sm remove_cart" data-id="{{ item.id }}">Remove</button>
                     </div>
                 </div>
@@ -36,15 +36,21 @@
         <div class="col-lg-4 mt-4 mt-lg-0">
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">Your Bucket Summary</h5>
+                    <h5 class="card-title"><b>Your Bucket Summary</b></h5>
                     <p class="card-text">Sub Total: <span id="subtotal">{{ total_price.total }}</span>/-</p>
                     <p class="card-text">All Taxes include GST and SGST: 30/-</p>
                     <p class="card-text">Delivery Charges: 50/-</p>
                     <p class="card-text">Instant Discount: 80/-</p>
                     <p class="card-text"><strong>Total: <span id="total_price">{{ total_price.total }}</span>/-</strong></p>
-                    <form id="order_form">
+                    <form id="order_form" >
                         {% csrf_token %}
-                        <button type="submit" class="btn btn-primary btn-block w-100">Proceed to Checkout</button>
+                            <label class="fa" for="payment_method">Payment Method:</label>
+                            <select class="form-control" id="payment_method" name="payment_method">
+                                <option class="form-control fa" value="u">Upi</option>
+                                <option class="form-control fa" value="c">Credit Card</option>
+                                <option class="form-control fa" value="cod" selected>Cash on delivery</option>
+                            </select><br>
+                            <button type="submit" class="btn btn-primary btn-block w-100 form-control">Proceed to Checkout</button>
                     </form>
                 </div>
             </div>
@@ -85,9 +91,13 @@
 
         $(document).on("submit", "#order_form", function(event){
             event.preventDefault();
+            alert('Your Order is in process please wait for a second...');
+            var form = $(this);
+            var formData = new FormData(form[0]);
             $.ajax({
                 url: "{% url 'create_order' %}",
                 type: "POST",
+                data: formData,
                 processData: false,
                 contentType: false,
                 headers: {
@@ -120,7 +130,6 @@
                     'X-CSRFToken': '{{ csrf_token }}'
                 },
                 success: function(response){
-                    cartItemElement.find('.cart-item-price').text(response.price + '/-');
                     cartItemElement.find('.cart-quantity').val(response.quantity);
                     $("#total_price").text(response.total_price.total);
                     $("#subtotal").text(response.total_price.total);

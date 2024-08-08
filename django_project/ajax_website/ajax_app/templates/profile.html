@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load custom_filters %}
 {% block content %}
 <div class="container my-5">
     <div class="card mb-5">
@@ -70,26 +71,26 @@
                             <td>{{ order.product.name }}</td>
                             <td>{{ order.product.price }}</td>
                             <td>{{ order.quantity }}</td>
-                            <td>{{ order.total }}</td>
+                            <td>{{ order.quantity|multiply:order.product.price }}</td>
                             <td>
-                                {% if order.status == 'c' %}
+                                {% if order.order.status == 'c' %}
                                 <span class="badge badge-success">Completed</span>
-                                {% elif order.status == 'r' %}
+                                {% elif order.order.status == 'r' %}
                                 <span class="badge badge-danger">Rejected</span>
                                 {% else %}
                                 <span class="badge badge-warning">Pending</span>
                                 {% endif %}
                             </td>
                             <td>
-                                {% if order.payment == 'c' %}
+                                {% if order.order.payment == 'c' %}
                                 <span class="badge badge-primary">Card</span>
-                                {% elif order.payment == 'u' %}
+                                {% elif order.order.payment == 'u' %}
                                 <span class="badge badge-info">UPI</span>
                                 {% else %}
                                 <span class="badge badge-secondary">Cash On Delivery</span>
                                 {% endif %}
                             </td>
-                            <td>{{ order.created_at }}</td>
+                            <td>{{ order.order.created_at }}</td>
                         </tr>
                         {% empty %}
                         <tr>

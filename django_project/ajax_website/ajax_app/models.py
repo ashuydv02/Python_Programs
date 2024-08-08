@@ -43,47 +43,64 @@ class Product(models.Model):
 
 class Cart(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    quantity = models.IntegerField(default=1)
-    total_price = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    class Meta:
-        ordering = ('-created_at',)
+    def __str__(self):
+        return f"Cart of {self.user.username}"
 
-    def save(self, *args, **kwargs):
-        self.total_price = self.quantity * self.product.price
-        super(Cart, self).save(*args, **kwargs)
+    def get_total_price(self):
+        return sum(item.get_total_price() for item in self.cartitem_set.all())
+
+
+class CartItem(models.Model):
+    cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    quantity = models.IntegerField(default=1)
 
     def __str__(self):
-        return (str(self.user) + ':- ' + str(self.product))
+        return f"{self.quantity} x {self.product.name}"
+
+    def get_total_price(self):
+        return self.product.price * self.quantity
 
 
 class Orders(models.Model):
-    status_choices = [
+    STATUS_CHOICES = [
         ('p', 'Pending'),
         ('c', 'Completed'),
         ('r', 'Rejected'),
     ]
-    payment_choices = [
+    PAYMENT_CHOICES = [
         ('cod', 'Cash on Delivery'),
-        ('u', 'Upi'),
+        ('u', 'UPI'),
         ('c', 'Card'),
     ]
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    quantity = models.PositiveIntegerField(default=1)
-    total = models.PositiveIntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
-    status = models.CharField(max_length=100, choices=status_choices, default='p')
-    payment = models.CharField(max_length=100, choices=payment_choices, default='cod')
+    status = models.CharField(max_length=1, choices=STATUS_CHOICES, default='p')
+    payment = models.CharField(max_length=3, choices=PAYMENT_CHOICES, default='cod')
 
     class Meta:
         ordering = ['-created_at']
 
     def __str__(self):
-        return (str(self.user) + ':- ' + str(self.product))
+        return f"Order #{self.id} by {self.user.username}"
+
+    def get_total(self):
+        return sum(item.get_total_price() for item in self.orderitem_set.all())
+
+
+class OrderItem(models.Model):
+    order = models.ForeignKey(Orders, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField(default=1)
+
+    def __str__(self):
+        return f"{self.quantity} x {self.product.name}"
+
+    def get_total_price(self):
+        return self.product.price * self.quantity
 
 
 class Contactus(models.Model):

@@ -7,7 +7,7 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from .serializers import *
 from .models import *
-from django.db.models import Sum
+from django.db.models import Sum, F
 from django.core.files.storage import FileSystemStorage
 from django.contrib.auth.mixins import LoginRequiredMixin
 
@@ -35,6 +35,13 @@ class MenuView(generic.TemplateView):
         return context
 
 
+class CartView(LoginRequiredMixin, generic.View):
+    def get(self, request):
+        cart = CartItem.objects.filter(cart__user=request.user)
+        total = cart.aggregate(total=Sum(F('quantity') * F('product__price')))
+        return render(request, 'cart.html', {'cart': cart, 'total_price':total})
+
+
 class CartViewApi(APIView):
     def post(self, request):
         id = request.data.get('id')
@@ -46,10 +53,11 @@ class CartViewApi(APIView):
         except Product.DoesNotExist:
             return Response({'error': 'Product not found'}, status=status.HTTP_404_NOT_FOUND)
 
-        cart, created = Cart.objects.get_or_create(user=request.user, product=product)
-        if not created:
-            cart.quantity += 1
-        cart.save()
+        cart, created = Cart.objects.get_or_create(user=request.user)
+        cart_item, item_created = CartItem.objects.get_or_create(cart=cart, product=product)
+        if not item_created:
+            cart_item.quantity += 1
+        cart_item.save()
         return Response({'message': 'Product added to cart'}, status=status.HTTP_200_OK)
     
     def delete(self, request, id):
@@ -57,11 +65,11 @@ class CartViewApi(APIView):
             return Response({'error': 'Product ID is required'}, status=status.HTTP_400_BAD_REQUEST)
         
         try:
-            cart = Cart.objects.get(id=id)
+            cart = CartItem.objects.get(id=id)
             cart.delete()
 
-            cart = Cart.objects.filter(user=request.user)
-            total = cart.aggregate(total=Sum('total_price'))
+            cart = CartItem.objects.filter(cart__user=request.user)
+            total = cart.aggregate(total=Sum(F('quantity') * F('product__price')))
             return Response({'message': 'Product removed from cart', 'total': total['total']},
                             status=status.HTTP_200_OK)
         
@@ -72,18 +80,17 @@ class CartViewApi(APIView):
 class UpdateCartViewApi(APIView):
     def put(self, request, id, format=None):
         try:
-            cart_item = Cart.objects.get(id=id)
+            cart_item = CartItem.objects.get(id=id)
         except Cart.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
         serializer = CartSerializer(cart_item, data=request.data, partial=True)
         if serializer.is_valid():
             updated_item = serializer.save()
-            cart = Cart.objects.filter(user=request.user)
-            total = cart.aggregate(total=Sum('total_price'))
+            cart = CartItem.objects.filter(cart__user=request.user)
+            total = cart.aggregate(total=Sum(F('quantity') * F('product__price')))
             response_data = {
                 'quantity': updated_item.quantity,
-                'price': updated_item.total_price,
                 'total_price': total,
             }
             return Response(response_data)
@@ -93,28 +100,26 @@ class UpdateCartViewApi(APIView):
 class OrderViewApi(APIView):
     def post(self, request):
         user = request.user
+        data = request.data
         if not user.is_authenticated:
             return Response({'error': 'User is not authenticated'}, status=status.HTTP_401_UNAUTHORIZED)
         
-        carts = Cart.objects.filter(user=user)
+        carts = CartItem.objects.filter(cart__user=user)
         if not carts.exists():
             return Response({'error': 'Cart is empty'}, status=status.HTTP_400_BAD_REQUEST)
-        for cart in carts:
-            Orders.objects.create(
-                user=user, 
-                product=cart.product, 
-                quantity=cart.quantity, 
-                total=cart.total_price
-            )
-            cart.delete()
-        messages.success(request, "Your Order has been succesfully palced...")
-        return Response({'message': 'Order placed successfully'}, status=status.HTTP_200_OK)
+        
+        order = Orders.objects.create(user=user, payment=data['payment_method'])
 
-class CartView(LoginRequiredMixin, generic.View):
-    def get(self, request):
-        cart = Cart.objects.filter(user=request.user)
-        total = cart.aggregate(total=Sum('total_price'))
-        return render(request, 'cart.html', {'cart': cart, 'total_price':total})
+        for cart in carts:
+            OrderItem.objects.create(
+                order=order,
+                product=cart.product, 
+                quantity=cart.quantity,
+            )
+
+        carts.delete()
+        messages.success(request, "Your Order has been succesfully placed and delivered to your registered address...")
+        return Response({'message': 'Order placed successfully'}, status=status.HTTP_200_OK)
 
 
 class AboutView(generic.TemplateView):
@@ -183,7 +188,7 @@ class ProfileView(LoginRequiredMixin, generic.View):
     template_name = 'profile.html'
 
     def get(self, request):
-        orders = Orders.objects.filter(user=request.user)
+        orders = OrderItem.objects.filter(order__user=request.user)
         return render(request, self.template_name, {'orders': orders})
 
     def post(self, request):

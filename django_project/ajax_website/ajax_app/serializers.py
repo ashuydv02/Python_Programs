@@ -3,7 +3,7 @@ from .models import *
 
 class CartSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Cart
+        model = CartItem
         fields = '__all__'
 
     def update(self, instance, validated_data):
