@@ -42,7 +42,7 @@
                     <p class="card-text">Delivery Charges: 50/-</p>
                     <p class="card-text">Instant Discount: 80/-</p>
                     <p class="card-text"><strong>Total: <span id="total_price">{{ total_price.total }}</span>/-</strong></p>
-                    <form id="order_form" >
+                    <form id="order_form" method="post" action="{% url 'create_order' %}">
                         {% csrf_token %}
                             <label class="fa" for="payment_method">Payment Method:</label>
                             <select class="form-control" id="payment_method" name="payment_method">
@@ -89,29 +89,7 @@
             });
         });
 
-        $(document).on("submit", "#order_form", function(event){
-            event.preventDefault();
-            alert('Your Order is in process please wait for a second...');
-            var form = $(this);
-            var formData = new FormData(form[0]);
-            $.ajax({
-                url: "{% url 'create_order' %}",
-                type: "POST",
-                data: formData,
-                processData: false,
-                contentType: false,
-                headers: {
-                    'X-CSRFToken': '{{ csrf_token }}'
-                },
-                success: function(response){
-                    $("#response").html('<div class="alert alert-success">' + response + '</div>');
-                    window.location.href = "{% url 'menu' %}";
-                },
-                error: function(xhr, status, error){
-                    $("#response").html('<div class="alert alert-danger">' + error + xhr.responseText +'</div>');
-                }
-            });
-        });
+        
 
         $(document).on("change", ".cart-quantity", function(event){
             event.preventDefault();

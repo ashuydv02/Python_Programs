@@ -21,5 +21,8 @@ urlpatterns = [
     path('registerapi/', RegisterViewApi.as_view(), name='registerapi'),
     path('profile/', ProfileView.as_view(), name='profile'),
 
+    path('success/', PaySuccessView.as_view(), name='success'),
+    path('cancel/', PaySuccessView.as_view(), name='cancel'),
+
     path('send_varification_code/', Send_Verification_Code.as_view(), name='send_verification_code'),
 ]

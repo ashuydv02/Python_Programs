@@ -1,6 +1,8 @@
 from pathlib import Path
 import os
 import environ
+import stripe
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -14,6 +16,9 @@ env = environ.Env()
 environ.Env.read_env()
 
 SECRET_KEY = env('DJANGO_SECRET_KEY')
+
+# Api key of Stripe
+stripe.api_key = env('stripe_api_key')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True

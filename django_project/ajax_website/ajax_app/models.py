@@ -64,6 +64,8 @@ class CartItem(models.Model):
     def get_total_price(self):
         return self.product.price * self.quantity
 
+    class Meta:
+        ordering = ['-cart__created_at']
 
 class Orders(models.Model):
     STATUS_CHOICES = [
@@ -101,6 +103,9 @@ class OrderItem(models.Model):
 
     def get_total_price(self):
         return self.product.price * self.quantity
+
+    class Meta:
+        ordering = ['-order__created_at']
 
 
 class Contactus(models.Model):

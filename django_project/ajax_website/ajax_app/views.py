@@ -15,6 +15,7 @@ from django.core.mail import send_mail, BadHeaderError
 from smtplib import SMTPException
 from django.conf import settings
 import random
+import stripe
 
 
 class HomeView(generic.TemplateView):
@@ -97,19 +98,55 @@ class UpdateCartViewApi(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 
-class OrderViewApi(APIView):
+class OrderViewApi(LoginRequiredMixin, generic.View):
     def post(self, request):
         user = request.user
-        data = request.data
+        data = request.POST
+        request.session['payment_method'] = data['payment_method']
         if not user.is_authenticated:
-            return Response({'error': 'User is not authenticated'}, status=status.HTTP_401_UNAUTHORIZED)
-        
+            messages.success(request, "Please login first...")
+            return redirect('cart')
+
         carts = CartItem.objects.filter(cart__user=user)
         if not carts.exists():
-            return Response({'error': 'Cart is empty'}, status=status.HTTP_400_BAD_REQUEST)
-        
-        order = Orders.objects.create(user=user, payment=data['payment_method'])
+            messages.success(request, "No items in the cart...")
+            return redirect('cart')
 
+        if data['payment_method'] == 'c':
+            try:
+                checkout_session = stripe.checkout.Session.create(
+                payment_method_types=['card'],
+                line_items = [
+                {
+                    "price_data": {
+                        "currency": "inr",
+                        "unit_amount": int(item.product.price) * 100,
+                        "product_data": {
+                            "name": item.product.name,
+                        },
+                    },
+                    "quantity": int(item.quantity),
+                }
+                for item in carts
+                ],
+                mode='payment',
+                success_url= 'http://127.0.0.1:8000/success',
+                cancel_url='http://127.0.0.1:8000/cancel',
+                )
+            except Exception as err:
+                messages.error(request, str(err))
+                return redirect('cart')
+
+        try:
+            return redirect(checkout_session.url, code=303)
+        except:
+            return redirect('success')
+
+
+class PaySuccessView(LoginRequiredMixin, generic.View):
+    def get(self, request, *args, **kwargs):
+        carts = CartItem.objects.filter(cart__user=request.user)
+        order = Orders.objects.create(user=request.user, payment=request.session['payment_method'])
         for cart in carts:
             OrderItem.objects.create(
                 order=order,
@@ -119,7 +156,13 @@ class OrderViewApi(APIView):
 
         carts.delete()
         messages.success(request, "Your Order has been succesfully placed and delivered to your registered address...")
-        return Response({'message': 'Order placed successfully'}, status=status.HTTP_200_OK)
+        return redirect('home')
+
+
+class PayCancelView(LoginRequiredMixin, generic.View):
+    def get(self, request, *args, **kwargs):
+        messages.error(request, "Some Error Occured so please try again...")
+        return redirect('cart')
 
 
 class AboutView(generic.TemplateView):
